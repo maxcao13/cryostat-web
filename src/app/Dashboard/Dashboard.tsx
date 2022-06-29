@@ -37,11 +37,21 @@
  */
 import * as React from 'react';
 import { TargetView } from '@app/TargetView/TargetView';
+import { Card, Grid, Stack } from '@patternfly/react-core';
+import { AutomatedAnalysisCard } from './AutomatedAnalysisCard';
 
 export const Dashboard = () => {
 
   return (
-    <TargetView pageTitle="Dashboard" compactSelect={true} />
+    <Stack>
+      <TargetView pageTitle="Dashboard" compactSelect={true} />
+      <Grid >  
+        <AutomatedAnalysisCard></AutomatedAnalysisCard>
+        <AutomatedAnalysisCard></AutomatedAnalysisCard>
+        <AutomatedAnalysisCard></AutomatedAnalysisCard>
+      </Grid>
+    </Stack>
+
   );
 
 }
