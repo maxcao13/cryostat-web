@@ -165,6 +165,19 @@ export class ApiService {
       });
   }
 
+  getJSONReport(recordingName: string): Observable<boolean> {
+    const headers = new Headers();
+    headers.set('Accept', 'application/json');
+    return this.target.target().pipe(concatMap(target =>
+      this.sendRequest('v1', `targets/${encodeURIComponent(target.connectUrl)}/reports/${recordingName}`, {
+        method: 'GET',
+        headers: headers
+      }).pipe(
+        map(resp => resp.ok),
+        first(),
+      )));
+  }
+
   createTarget(target: Target): Observable<boolean> {
     const form = new window.FormData();
     form.append('connectUrl', target.connectUrl);

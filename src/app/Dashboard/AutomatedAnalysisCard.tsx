@@ -40,73 +40,113 @@ import { Card, CardBody, CardTitle, CardFooter, Button } from '@patternfly/react
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom';
 import * as React from 'react';
 import { useSubscriptions } from '@app/utils/useSubscriptions';
-import { Target } from '@app/Shared/Services/Target.service';
+import { NO_TARGET, Target, TargetInstance } from '@app/Shared/Services/Target.service';
+import { ActiveRecording, isHttpError } from '@app/Shared/Services/Api.service';
+import { filter, concatMap, first } from 'rxjs/operators';
+import { isGenerationError } from '@app/Shared/Services/Report.service';
+import { ScoreChip } from './ScoreChip';
 
 interface AutomatedAnalysisProps {
-  target: Target;
-  
+  title: string
 }
 
-const context = React.useContext(ServiceContext);
-const history = useHistory();
-const addSubscription = useSubscriptions();
 
-const [report, setReport] = React.useState(undefined as string | undefined);
+interface Analysis {
 
-const handleCreateSnapshot = (): void => {
-  addSubscription(
-    context.api.createSnapshot()
-    .pipe(first())
-    .subscribe(success => {
-      if (success) {
-        history.push('/recordings');
-      }
-    })
-  );
-};
+  scores: [{}]
+}
 
-React.useLayoutEffect(() => {
-  const sub = context.reports.report(recording).pipe(
-    first()
-  ).subscribe(report => setReport(report), err => {
-    if (isGenerationError(err)) {
-      err.messageDetail.pipe(first()).subscribe(detail => setReport(detail));
-    } else if (isHttpError(err)) {
-      setReport(err.message);
-    } else {
-      setReport(JSON.stringify(err));
-    }
-  });
-  return () =>  sub.unsubscribe();
-}, [context, context.reports, recording, isExpanded, setReport, props, props.isExpanded, props.recording]);
-
-
-const ruleRows = React.useMemo(() => {
-  return recordings.map((r, idx) => <RecordingRow key={idx} recording={r} index={idx}/>)
-}, [recordings, expandedRows, checkedIndices]);
-
-
-
-
-export const AutomatedAnalysisCard = ({} : AutomatedAnalysisProps) => {
+export const AutomatedAnalysisCard = ({title} : AutomatedAnalysisProps) => {
   const context = React.useContext(ServiceContext);
+  const history = useHistory();
+  const addSubscription = useSubscriptions();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [report, setReport] = React.useState(undefined as string | undefined);
+  const [recordings, setRecordings] = React.useState([] as ActiveRecording[]);
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const [automatedAnalysis, setAutomatedAnalysis] = React.useState(undefined as Analysis | undefined)
+  
 
+
+  const handleCreateSnapshot = (report): void => {
+    // addSubscription(
+    //   context.api.createSnapshot()
+    //   .pipe(first())
+    //   .subscribe(success => {
+    //     if (success) {
+    //       history.push('/recordings');
+    //     }
+    //   })
+    // );
+    console.log(recordings);
+  };
+
+
+  
+  const handleRecordings = React.useCallback((recordings) => {
+    setRecordings(recordings);
+    setIsLoading(false);
+    setErrorMessage('');
+  }, [setRecordings, setIsLoading, setErrorMessage]);
+
+  React.useEffect(() => {
+    if (recordings.length !== 0) {
+      addSubscription(
+        context.api.getJSONReport(recordings[0].name)
+        .pipe(first())
+        .subscribe(value => {
+          console.log(value);
+          console.log("yes");
+          handleCreateSnapshot(value)
+        })
+      );
+      console.log("hehe")
+    }
+  }, [addSubscription, recordings, setRecordings])
+  
+  const handleError = React.useCallback((error) => {
+    setIsLoading(false);
+    setErrorMessage(error.message);
+  }, [setIsLoading, setErrorMessage]);
+  
+  const refreshRecordingList = React.useCallback(() => {
+    setIsLoading(true);
+    addSubscription(
+      context.target.target()
+      .pipe(
+        filter(target => target !== NO_TARGET),
+        concatMap(target => context.api.doGet<ActiveRecording[]>(`targets/${encodeURIComponent(target.connectUrl)}/recordings`)),
+        first(),
+      ).subscribe(value => handleRecordings(value), err => handleError(err))
+    );
+  }, [addSubscription, context, context.target, context.api, setIsLoading, handleRecordings, handleError]);
+  
+  React.useEffect(() => {
+    addSubscription(
+      context.target.target().subscribe(refreshRecordingList)
+    );
+  }, [addSubscription, context, context.target, refreshRecordingList]);
+
+  React.useEffect(() => {
+    const sub = context.target.authFailure().subscribe(() => {
+      setErrorMessage("Auth failure");
+    });
+    return () => sub.unsubscribe();
+  }, [context, context.target, setErrorMessage]);
+  
   return (<>
     <Card>
-        <CardTitle>Header</CardTitle>
+        <CardTitle>{title}</CardTitle>
         <CardBody>
-          <Button onClick={handleCreateSnapshot}>
+          {/* <Button onClick={() => console.log("Hello")}>
 
-          </Button>
+          </Button> */}
+          <ScoreChip />
         </CardBody>
         <CardFooter>  </CardFooter>
     </Card>
 
   </>);
 
-}
-
-function first(): any {
-  throw new Error('Function not implemented.');
 }
 

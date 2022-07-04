@@ -37,18 +37,28 @@
  */
 import * as React from 'react';
 import { TargetView } from '@app/TargetView/TargetView';
-import { Card, Grid, Stack } from '@patternfly/react-core';
+import { Card, Grid, GridItem, Stack } from '@patternfly/react-core';
 import { AutomatedAnalysisCard } from './AutomatedAnalysisCard';
+import { ServiceContext } from '@app/Shared/Services/Services';
+import {first} from 'rxjs'; 
 
 export const Dashboard = () => {
-
+  const context = React.useContext(ServiceContext);
   return (
     <Stack>
       <TargetView pageTitle="Dashboard" compactSelect={true} />
-      <Grid >  
-        <AutomatedAnalysisCard></AutomatedAnalysisCard>
-        <AutomatedAnalysisCard></AutomatedAnalysisCard>
-        <AutomatedAnalysisCard></AutomatedAnalysisCard>
+      <Grid hasGutter >  
+        {/* <AutomatedAnalysisCard></AutomatedAnalysisCard>
+        <AutomatedAnalysisCard></AutomatedAnalysisCard> */}
+        <GridItem span={4} rowSpan={4}>
+          <AutomatedAnalysisCard title={`My Application`}></AutomatedAnalysisCard>
+        </GridItem>
+        <GridItem span={4} rowSpan={4}>
+        <AutomatedAnalysisCard title={`Some other application`}></AutomatedAnalysisCard>
+        </GridItem>
+        <GridItem span={4} rowSpan={4}>
+          <AutomatedAnalysisCard title={`another application`}></AutomatedAnalysisCard>
+        </GridItem>
       </Grid>
     </Stack>
 
