@@ -44,17 +44,19 @@ import { useSubscriptions } from '@app/utils/useSubscriptions';
 import { ActionGroup, Button, FileUpload, Form, FormGroup, Modal, ModalVariant, Toolbar, ToolbarContent, ToolbarGroup, ToolbarItem, TextInput } from '@patternfly/react-core';
 import { UploadIcon } from '@patternfly/react-icons';
 import { Table, TableBody, TableHeader, TableVariant, IAction, IRowData, IExtraData, ISortBy, SortByDirection, sortable } from '@patternfly/react-table';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useRouteMatch } from 'react-router-dom';
 import { concatMap, filter, first } from 'rxjs/operators';
 import { LoadingView } from '@app/LoadingView/LoadingView';
 import { ErrorView } from '@app/ErrorView/ErrorView';
 import { DeleteWarningType } from '@app/Modal/DeleteWarningUtils';
 import { DeleteWarningModal } from '@app/Modal/DeleteWarningModal';
+import { BreadcrumbPage } from '@app/BreadcrumbPage/BreadcrumbPage';
 
 export const EventTemplates = () => {
   const context = React.useContext(ServiceContext);
-  const history = useHistory();
+  const routerHistory = useHistory();
 
+  const { url } = useRouteMatch();
   const [templates, setTemplates] = React.useState([] as EventTemplate[]);
   const [filteredTemplates, setFilteredTemplates] = React.useState([] as EventTemplate[]);
   const [filterText, setFilterText] = React.useState('');
@@ -175,7 +177,7 @@ export const EventTemplates = () => {
     let actions = [
       {
         title: 'Create Recording...',
-        onClick: (event, rowId, rowData) => history.push({ pathname: '/recordings/create', state: { template: rowData[0], templateType: String(rowData[3]).toUpperCase() } }),
+        onClick: (event, rowId, rowData) => routerHistory.push({ pathname: '/recordings/create', state: { template: rowData[0], templateType: String(rowData[3]).toUpperCase() } }),
       },
     ] as IAction[];
 
@@ -255,6 +257,10 @@ export const EventTemplates = () => {
     setSortBy({ index, direction });
   };
 
+  const handleCreateEventTemplate = React.useCallback(() => {
+    routerHistory.push(`${url}/create`);
+  }, [routerHistory]);
+
   const handleDeleteButton = React.useCallback((rowData) => {
     if (context.settings.deletionDialogsEnabledFor(DeleteWarningType.DeleteEventTemplates)) {
       setRowDeleteData(rowData);
@@ -283,11 +289,14 @@ export const EventTemplates = () => {
         </ToolbarGroup>
         <ToolbarGroup variant="icon-button-group">
           <ToolbarItem>
-            <Button key="upload" variant="secondary" onClick={handleModalToggle}>
+            <Button key="create" variant="primary" onClick={handleCreateEventTemplate}>Create</Button>
+            {' '}
+            <Button key="upload" variant="secondary" aria-label='Upload' onClick={handleModalToggle}>
               <UploadIcon/>
             </Button>
           </ToolbarItem>
         </ToolbarGroup>
+
         <DeleteWarningModal 
           warningType={DeleteWarningType.DeleteEventTemplates}
           visible={warningModalOpen}

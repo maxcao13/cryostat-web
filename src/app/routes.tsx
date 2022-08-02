@@ -54,6 +54,7 @@ import { Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { LastLocationProvider, useLastLocation } from 'react-router-last-location';
 import { About } from './About/About';
 import { SessionState } from './Shared/Services/Login.service';
+import { CreateEventTemplate } from './Events/CreateEventTemplate';
 
 let routeFocusTimer: number;
 const OVERVIEW = 'Overview';
@@ -145,6 +146,14 @@ const routes: IAppRoute[] = [
     title: 'Events',
     description: 'View available JFR event templates and types for target JVMs, as well as upload custom templates.',
     navGroup: CONSOLE,
+    children: [
+      {
+        component: CreateEventTemplate,
+        exact: true,
+        path: '/events/create',
+        title: 'Create Event Template',
+      },
+    ],
   },
   {
     component: SecurityPanel,
