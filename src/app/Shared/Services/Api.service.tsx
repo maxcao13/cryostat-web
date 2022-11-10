@@ -289,7 +289,7 @@ export class ApiService {
     );
   }
 
-  createSnapshotv2(): Observable<Recording> {
+  createSnapshotV2(): Observable<Recording> {
     return this.target.target().pipe(
       concatMap((target) =>
         this.sendRequest('v2', `targets/${encodeURIComponent(target.connectUrl)}/snapshot`, {
@@ -298,16 +298,15 @@ export class ApiService {
           concatMap((resp) => {
             if (resp.status == 202) {
               return throwError(() => new Error('Unable to create snapshot'));
-            }
-            else {
+            } else {
               return resp.json();
             }
           }),
           map((response) => response.data.result),
-          first(),
+          first()
         )
       )
-    )
+    );
   }
 
   isArchiveEnabled(): Observable<boolean> {
@@ -623,24 +622,6 @@ export class ApiService {
       map((resp) => resp.json()),
       concatMap(from),
       first()
-    );
-  }
-
-  getSnapshotReportJson(): Observable<String> {
-    return this.target.target().pipe(
-      concatMap((target) =>
-        this.sendRequest(
-          'v2',
-          `targets/${encodeURIComponent(target.connectUrl)}/reports/snapshot`,
-          {
-            method: 'GET',
-          }
-        ).pipe(
-          map((resp) => resp.json()),
-          concatMap(from),
-          first()
-        )
-      )
     );
   }
 
@@ -1032,9 +1013,10 @@ export interface ArchivedRecording {
   reportUrl: string;
   metadata: Metadata;
   size: number;
+  archivedTime: number;
 }
 
-export interface ActiveRecording extends Omit<ArchivedRecording, 'size'> {
+export interface ActiveRecording extends Omit<ArchivedRecording, 'size' | 'archivedTime'> {
   id: number;
   state: RecordingState;
   duration: number;
@@ -1114,6 +1096,23 @@ export interface MatchedCredential {
   matchExpression: string;
   targets: Target[];
 }
+
+export const defaultAutomatedAnalysis: RecordingAttributes = {
+  name: 'automated-analysis',
+  events: 'template=Continuous,type=TARGET',
+  duration: undefined,
+  archiveOnStop: false,
+  options: {
+    toDisk: true,
+    maxAge: 0,
+    maxSize: 0,
+  },
+  metadata: {
+    labels: {
+      createdFrom: 'automatedAnalysis',
+    },
+  },
+};
 
 // New target specific archived recording apis now enforce a non-empty target field
 // The placeholder targetId for uploaded (non-target) recordings is "uploads"
