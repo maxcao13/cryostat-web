@@ -53,6 +53,7 @@ export const isAuthFail = (message: string) => message === authFailMessage;
 export interface ErrorViewProps {
   title: string | React.ReactNode;
   message: string | React.ReactNode;
+  retryButtonMessage?: string;
   retry?: () => void;
 }
 
@@ -71,7 +72,7 @@ export const ErrorView: React.FunctionComponent<ErrorViewProps> = (props) => {
               {props.retry && (
                 <StackItem>
                   <Button variant="link" onClick={props.retry}>
-                    Retry
+                    {props.retryButtonMessage || 'Retry'}
                   </Button>
                 </StackItem>
               )}
