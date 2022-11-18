@@ -301,8 +301,6 @@ export class ApiService {
               return throwError(() => new Error('Unable to create snapshot'));
             }
             else if (resp.status == 427) {
-              console.log("JMX");
-              
               return throwError(() => new Error('JMX Authentication Required'));
             } else {
               return resp.json();
@@ -1110,19 +1108,21 @@ export interface MatchedCredential {
   targets: Target[];
 }
 
-export const defaultAutomatedAnalysis: RecordingAttributes = {
-  name: 'automated-analysis',
+export const automatedAnalysisTag = 'automated-analysis';
+
+export const defaultAutomatedAnalysisRecording: RecordingAttributes = {
+  name: automatedAnalysisTag,
   events: 'template=Continuous,type=TARGET',
   duration: undefined,
   archiveOnStop: false,
   options: {
     toDisk: true,
     maxAge: 0,
-    maxSize: 0,
+    maxSize: 2048,
   },
   metadata: {
     labels: {
-      createdFrom: 'automatedAnalysis',
+      origin: automatedAnalysisTag,
     },
   },
 };
