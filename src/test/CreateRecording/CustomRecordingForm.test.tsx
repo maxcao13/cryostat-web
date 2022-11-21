@@ -113,7 +113,7 @@ describe('<CustomRecordingForm />', () => {
   });
 
   it('should create recording when form is filled and create is clicked', async () => {
-    const onSubmitSpy = jest.spyOn(defaultServices.api, 'createRecording').mockReturnValue(of(true));
+    const onSubmitSpy = jest.spyOn(defaultServices.api, 'createRecording').mockReturnValue(of());
     const { user } = renderWithServiceContext(<CustomRecordingForm />);
 
     const nameInput = screen.getByLabelText('Name *');
