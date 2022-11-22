@@ -46,7 +46,6 @@ import { Rule } from '@app/Rules/Rules';
 import { NotificationCategory } from './NotificationChannel.service';
 import _ from 'lodash';
 import { createBlobURL } from '@app/utils/utils';
-import { ORANGE_SCORE_THRESHOLD, RED_SCORE_THRESHOLD } from './Report.service';
 
 type ApiVersion = 'v1' | 'v2' | 'v2.1' | 'v2.2' | 'beta';
 
@@ -1035,13 +1034,6 @@ export interface ActiveRecording extends Omit<ArchivedRecording, 'size' | 'archi
   toDisk: boolean;
   maxSize: number;
   maxAge: number;
-}
-
-export enum AutomatedAnalysisScoreState {
-  NA = 'NA',
-  OK = 'OK',
-  WARNING = 'WARNING',
-  CRITICAL = 'CRITICAL',
 }
 
 export enum RecordingState {
