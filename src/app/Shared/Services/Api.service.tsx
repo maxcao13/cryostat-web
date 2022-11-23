@@ -46,6 +46,7 @@ import { Rule } from '@app/Rules/Rules';
 import { NotificationCategory } from './NotificationChannel.service';
 import _ from 'lodash';
 import { createBlobURL } from '@app/utils/utils';
+import { automatedAnalysisRecordingName } from '@app/Dashboard/AutomatedAnalysis/AutomatedAnalysisCard';
 
 type ApiVersion = 'v1' | 'v2' | 'v2.1' | 'v2.2' | 'beta';
 
@@ -298,8 +299,7 @@ export class ApiService {
           concatMap((resp) => {
             if (resp.status == 202) {
               return throwError(() => new Error('Unable to create snapshot'));
-            }
-            else if (resp.status == 427) {
+            } else if (resp.status == 427) {
               return throwError(() => new Error('JMX Authentication Required'));
             } else {
               return resp.json();
@@ -1100,10 +1100,8 @@ export interface MatchedCredential {
   targets: Target[];
 }
 
-export const automatedAnalysisTag = 'automated-analysis';
-
 export const defaultAutomatedAnalysisRecording: RecordingAttributes = {
-  name: automatedAnalysisTag,
+  name: automatedAnalysisRecordingName,
   events: 'template=Continuous,type=TARGET',
   duration: undefined,
   archiveOnStop: false,
@@ -1114,7 +1112,7 @@ export const defaultAutomatedAnalysisRecording: RecordingAttributes = {
   },
   metadata: {
     labels: {
-      origin: automatedAnalysisTag,
+      origin: automatedAnalysisRecordingName,
     },
   },
 };
