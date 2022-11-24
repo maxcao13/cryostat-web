@@ -1109,7 +1109,9 @@ export interface MatchedCredential {
   targets: Target[];
 }
 
-export const automatedAnalysisConfigToRecordingAttributes = (config: AutomatedAnalysisRecordingConfig): RecordingAttributes => {
+export const automatedAnalysisConfigToRecordingAttributes = (
+  config: AutomatedAnalysisRecordingConfig
+): RecordingAttributes => {
   return {
     name: automatedAnalysisRecordingName,
     events: config.templates,
@@ -1126,7 +1128,7 @@ export const automatedAnalysisConfigToRecordingAttributes = (config: AutomatedAn
       },
     },
   } as RecordingAttributes;
-}
+};
 
 // New target specific archived recording apis now enforce a non-empty target field
 // The placeholder targetId for uploaded (non-target) recordings is "uploads"
