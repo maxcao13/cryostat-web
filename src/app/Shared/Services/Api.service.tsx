@@ -47,6 +47,7 @@ import { NotificationCategory } from './NotificationChannel.service';
 import _ from 'lodash';
 import { createBlobURL } from '@app/utils/utils';
 import { automatedAnalysisRecordingName } from '@app/Dashboard/AutomatedAnalysis/AutomatedAnalysisCard';
+import { AutomatedAnalysisRecordingConfig } from './Settings.service';
 
 type ApiVersion = 'v1' | 'v2' | 'v2.1' | 'v2.2' | 'beta';
 
@@ -1108,22 +1109,24 @@ export interface MatchedCredential {
   targets: Target[];
 }
 
-export const defaultAutomatedAnalysisRecording: RecordingAttributes = {
-  name: automatedAnalysisRecordingName,
-  events: 'template=Continuous,type=TARGET',
-  duration: undefined,
-  archiveOnStop: false,
-  options: {
-    toDisk: true,
-    maxAge: 0,
-    maxSize: 2048,
-  },
-  metadata: {
-    labels: {
-      origin: automatedAnalysisRecordingName,
+export const automatedAnalysisConfigToRecordingAttributes = (config: AutomatedAnalysisRecordingConfig): RecordingAttributes => {
+  return {
+    name: automatedAnalysisRecordingName,
+    events: config.templates,
+    duration: undefined,
+    archiveOnStop: false,
+    options: {
+      toDisk: true,
+      maxAge: config.maxAge,
+      maxSize: config.maxSize,
     },
-  },
-};
+    metadata: {
+      labels: {
+        origin: automatedAnalysisRecordingName,
+      },
+    },
+  } as RecordingAttributes;
+}
 
 // New target specific archived recording apis now enforce a non-empty target field
 // The placeholder targetId for uploaded (non-target) recordings is "uploads"
