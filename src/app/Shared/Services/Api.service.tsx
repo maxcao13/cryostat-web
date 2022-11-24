@@ -46,8 +46,6 @@ import { Rule } from '@app/Rules/Rules';
 import { NotificationCategory } from './NotificationChannel.service';
 import _ from 'lodash';
 import { createBlobURL } from '@app/utils/utils';
-import { automatedAnalysisRecordingName } from '@app/Dashboard/AutomatedAnalysis/AutomatedAnalysisCard';
-import { AutomatedAnalysisRecordingConfig } from './Settings.service';
 
 type ApiVersion = 'v1' | 'v2' | 'v2.1' | 'v2.2' | 'beta';
 
@@ -1100,6 +1098,20 @@ export interface MatchedCredential {
   matchExpression: string;
   targets: Target[];
 }
+
+export const automatedAnalysisRecordingName = 'automated-analysis';
+
+export interface AutomatedAnalysisRecordingConfig {
+  templates: string;
+  maxSize: number;
+  maxAge: number;
+}
+
+export const defaultAutomatedAnalysisRecordingConfig: AutomatedAnalysisRecordingConfig = {
+  templates: 'template=Continuous,type=TARGET',
+  maxSize: 2048,
+  maxAge: 0,
+};
 
 export const automatedAnalysisConfigToRecordingAttributes = (
   config: AutomatedAnalysisRecordingConfig
